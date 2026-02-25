@@ -17,6 +17,14 @@ class Simulation:
         self.stats = stats
         self.patients = patients
     
+    #TODO: create run method to begin running a simulation
+    #run() -> void
+
+    #TODO: create schedule method to add an event 
+    #schedule(Event) -> void
+
+    #TODO: create method to get the current simulation time
+    #curr_time() -> float
     pass
 
     
