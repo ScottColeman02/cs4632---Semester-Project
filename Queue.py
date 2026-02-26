@@ -23,8 +23,8 @@ class PriorityQueue(Queue):
         super().__init__()
         self.queue = []
 
-    def enqueue(self, item):
-        heapq.heappush(self.queue,item)
+    def enqueue(self, patient):
+        heapq.heappush(self.queue, (patient.esi, patient.arrival, patient.id))
 
     def dequeue(self):
         return heapq.heappop(self.queue)
