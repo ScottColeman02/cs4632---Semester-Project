@@ -1,4 +1,18 @@
+from Patient import Patient
 class Event:
-    time = 0.0
-    patient_id = 0
-    event_type = ""
+    def __init__(self,simulation):
+        self.time = simulation.clock
+        self.patient_id = 0
+    
+    def execute():
+        raise NotImplementedError
+
+
+class Arrive(Event):
+    def __init__(self, simulation):
+        super().__init__(simulation)
+
+    def execute():
+        patient = Patient()
+        print("Patient "+patient.patient_id+" has arrived")
+        patient.status = "WAITING_TRIAGE"

@@ -1,31 +1,36 @@
+from EventList import EventList
+from ResourceManager import ResourceManager
+from QueueManager import QueueManager
+from TriagePolicy import TriagePolicy
+from StatsCollector import StatsCollector
 class Simulation:
-    clock = 0.0
-    event_list = None
-    resources = None
-    queues = None
-    triage_policy = None
-    stats = None
-    patients = {}
-    next_patient_id = 0
-
-    def __init__(self, clock, event_list, resources, queues, triage_policy, stats, patients):
-        self.clock = clock
-        self.event_list = event_list
-        self.resources = resources
-        self.queues = queues
-        self.triage_policy = triage_policy
-        self.stats = stats
-        self.patients = patients
+    def __init__(self):
+        self.clock = 0.0
+        self.event_list = EventList()
+        self.resources = ResourceManager()
+        self.queues = QueueManager()
+        self.triage_policy = TriagePolicy()
+        self.stats = StatsCollector()
+        self.patients = {}
     
     #TODO: create run method to begin running a simulation
     #run() -> void
 
+    def run(self):
+        while self.event_list:
+            event = self.event_list.pop()
+            
+            self.clock += 1
+
+            
+
+
     #TODO: create schedule method to add an event 
     #schedule(Event) -> void
 
-    #TODO: create method to get the current simulation time
-    #curr_time() -> float
-    pass
+    def curr_time(self):
+        return self.clock
+    
 
     
     
