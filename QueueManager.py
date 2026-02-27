@@ -1,4 +1,4 @@
-from Queue import *
+from DataStructures import FIFOqueue, PriorityQueue
 class QueueManager:
     def __init__(self):
         #Triage queue to store patients based on ESI level,
@@ -6,7 +6,7 @@ class QueueManager:
         self.triage_queue = FIFOqueue()
 
         #Waiting room queue also implemented as priority queue
-        self.waiting_room_queue = PriorityQueue()
+        self.bed_queue = PriorityQueue()
         self.provider_queue = PriorityQueue()
 
         #lab and inpatient bed queues implemented as standard FIFO queues.

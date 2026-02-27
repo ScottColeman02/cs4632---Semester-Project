@@ -1,4 +1,4 @@
-from Queue import FIFOqueue
+from DataStructures import FIFOqueue
 class EventList:
     def __init__(self):
         self.events = FIFOqueue()

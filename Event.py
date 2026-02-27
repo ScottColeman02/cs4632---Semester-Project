@@ -19,4 +19,48 @@ class Arrive(Event):
         print("Patient "+str(patient.patient_id)+" has arrived")
         patient.status = "WAITING_TRIAGE"
         self.simulation.queues.triage_queue.enqueue(patient)
+
+class Start_Triage(Event):
+    def __init__(self, simulation):
+        super().__init__(simulation)
+
+    def execute(self):
+        patient = self.simulation.queues.triage_queue.dequeue()
+        patient.status = "IN_TRIAGE"
+
+        if(patient.severity >= 9 or patient.chief_complaint == "CHEST_PAIN"):
+            patient.esi = 1
+        elif(patient.severity >= 7 and patient.severity <= 8):
+            patient.esi = 2
+        elif(patient.severity >= 5 and patient.severity <= 6):
+            patient.esi = 3
+        elif(patient.severity >= 3 and patient.severity <= 4):
+            patient.esi = 4
+        elif(patient.severity >= 1 and patient.severity <= 2):
+            patient.esi = 5 
+
+        return End_Triage(), patient    
+
         
+
+class End_Triage(Event):
+    def __init__(self, simulation):
+        super().__init__(simulation)
+
+    def execute(self, patient):
+        print("Patient "+str(patient.patient_id)+" has been triaged, ESI = "+str(patient.esi))
+        self.simulation.queues.bed_queue.enqueue(patient)
+        patient.status = "WAITING_BED"
+
+        return Transfer_to_bed()
+
+class Transfer_to_bed(Event):
+    def __init__(self, simulation):
+        super().__init__(simulation)
+
+    def execute(self):
+        self.simulation.resources.seize("nurse")
+        self.simulation.resources.seize("bed")
+        
+        pass        
+

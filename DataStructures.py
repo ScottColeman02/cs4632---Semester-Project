@@ -12,6 +12,9 @@ class FIFOqueue(Queue):
         super().__init__()
         self.queue = deque()
 
+    def __repr__(self):
+        return repr(self.queue)  
+    
     def enqueue(self,item):
         self.queue.appendleft(item)
 
@@ -23,8 +26,22 @@ class PriorityQueue(Queue):
         super().__init__()
         self.queue = []
 
+    def __repr__(self):
+        return repr(self.queue)    
+
     def enqueue(self, patient):
-        heapq.heappush(self.queue, (patient.esi, patient.arrival, patient.id))
+        heapq.heappush(self.queue, (patient.esi, patient.arrival_time, patient.severity, patient.patient_id))
 
     def dequeue(self):
         return heapq.heappop(self.queue)
+
+class Stack:
+    def __init__(self):
+        self.stack = deque()
+        
+
+    def push(self,item):
+        self.stack.append(item)
+
+    def pop(self):
+        return self.stack.pop()    
