@@ -1,10 +1,12 @@
 from Simulation import Simulation
 from Patient import Patient
+from Event import *
 
 sim = Simulation()
-patient = Patient(sim)
+arrive_test = Arrive(sim)
 
-print(str(patient.arrival_time))
+
+print(str(arrive_test.execute()))
 
 #print("==========ER Simulation==========")
 

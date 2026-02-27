@@ -1,15 +1,14 @@
-import heapq
-from collections import deque
+from Queue import *
 class QueueManager:
     def __init__(self):
         #Triage queue to store patients based on ESI level,
         #implemented using a priority queue.
-        self.triage_queue = []
+        self.triage_queue = FIFOqueue()
 
         #Waiting room queue also implemented as priority queue
-        self.waiting_room_queue = []
+        self.waiting_room_queue = PriorityQueue()
+        self.provider_queue = PriorityQueue()
 
-        #Provider, lab, and inpatient bed queues implemented as standard FIFO queues.
-        self.provider_queue = deque()
-        self.lab_queue = deque()
-        self.inpatient_bed_queue = deque()
+        #lab and inpatient bed queues implemented as standard FIFO queues.
+        self.lab_queue = FIFOqueue()
+        self.inpatient_bed_queue = FIFOqueue()
