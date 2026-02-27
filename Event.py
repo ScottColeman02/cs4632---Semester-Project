@@ -58,9 +58,20 @@ class Transfer_to_bed(Event):
     def __init__(self, simulation):
         super().__init__(simulation)
 
-    def execute(self):
-        self.simulation.resources.seize("nurse")
-        self.simulation.resources.seize("bed")
-        
-        pass        
+    def execute(self,patient):
+        patient = self.simulation.queues.bed_queue.dequeue()
+        patient.status = "TRANSFERING_TO_BED"
+
+        nurse = self.simulation.resources.seize("nurse")
+        nurse.available = False
+        return Get_to_bed(), patient, nurse   
+
+class Get_to_bed(Event):
+    def __init__(self, simulation):
+        super().__init__(simulation)
+
+    def execute(self, patient, nurse):
+        bed = self.simulation.resources.seize("bed")
+        bed.available = False
+        pass    
 

@@ -6,12 +6,6 @@ class Resource:
         self.name = ""
         self.available = True
 
-    def set_available(self):
-        self.available = True
-
-    def set_unavailable(self):
-        self.available = False
-
 class Nurse(Resource):
     def __init__(self):
         super().__init__()
