@@ -1,11 +1,13 @@
 from DataStructures import Stack
 class ResourceManager:
+    triage_nurse_stack = Stack()
     provider_stack = Stack()
     nurse_stack = Stack()
     tech_stack = Stack()
     bed_stack = Stack()
 
     def __init__(self):
+        self.triage_nurses_available = 0
         self.nurses_available = 0
         self.beds_available = 0
         self.providers_available = 0
@@ -14,9 +16,21 @@ class ResourceManager:
 
     def seize(self, resource):
         match resource:
+            case "triage":
+                if(self.triage_nurses_available == 0):
+                    print(resource+" not available")
+
+                    return False
+                
+                self.triage_nurses_available -= 1
+                triage_nurse = self.triage_nurse_stack.pop()
+                triage_nurse.available = False
+                return triage_nurse
             case "provider":
                 if(self.providers_available == 0):
                     print(resource+" not available")
+
+                    return False
 
                 self.providers_available -= 1
                 provider = self.provider_stack.pop()
@@ -26,6 +40,8 @@ class ResourceManager:
                 if(self.nurses_available == 0):
                     print(resource+" not available") 
 
+                    return False
+
                 nurse = self.nurse_stack.pop()
                 nurse.available = False
                 return nurse 
@@ -33,12 +49,16 @@ class ResourceManager:
                 if(self.lab_techs_available == 0):
                     print(resource+" not available")
 
+                    return False
+
                 tech = self.tech_stack.pop()
                 tech.available = False
                 return tech   
             case "bed":
                 if(self.beds_available == 0):
-                    print(resource+" not available")      
+                    print(resource+" not available")   
+
+                    return False   
 
                 bed = self.bed_stack.pop()
                 bed.available = False
@@ -48,6 +68,9 @@ class ResourceManager:
     
     def release(self, name, resource):
         match name:
+            case "triage":
+                self.triage_nurses_available += 1
+                self.triage_nurse_stack.push(resource)
             case "provider":
                 self.providers_available += 1 
                 self.provider_stack.push(resource)  

@@ -3,6 +3,7 @@ from ResourceManager import ResourceManager
 from QueueManager import QueueManager
 from TriagePolicy import TriagePolicy
 from StatsCollector import StatsCollector
+from Event import Event,Arrive
 class Simulation:
     def __init__(self):
         self.clock = 0.0
@@ -11,25 +12,27 @@ class Simulation:
         self.queues = QueueManager()
         self.triage_policy = TriagePolicy()
         self.stats = StatsCollector()
-        self.patients = {}
+        self.max_time = 0.0
     
-    #TODO: create run method to begin running a simulation
-    #run() -> void
 
     def run(self):
-        while self.event_list:
-            event = self.event_list.pop()
+        self.event_list.push(self.clock,Arrive(self))
+        while not self.event_list.is_empty() and self.clock < self.max_time:
+            time,id, event = self.event_list.pop()
+
+            if int(time) > self.max_time:
+                break
+
+            self.clock = time
+            print("\nTime is "+str(self.clock))
+
+            event.execute()
             
-            self.clock += 1
 
-            
+    def schedule(self, event, time):
+        self.event_list.push(time,event)
 
-
-    #TODO: create schedule method to add an event 
-    #schedule(Event) -> void
-
-    def curr_time(self):
-        return self.clock
+    
     
 
     

@@ -1,18 +1,21 @@
-from DataStructures import FIFOqueue
+import heapq
 class EventList:
     def __init__(self):
-        self.events = FIFOqueue()
+        self.events = []
+        self.id = 0
 
 
-    #TODO: create push method to add a new event
-    #push(e: Event) -> void
+    def push(self, time, event):
+        self.id += 1
+        heapq.heappush(self.events, (time,self.id,event))
+        
+    def pop(self):
+        return heapq.heappop(self.events)  
 
-  
+    def is_empty(self):
+        if len(self.events) == 0:
+            return True
+        else:
+            return False  
 
-    #TODO: create pop method to get the next event to be serviced
-    #pop() -> Event
-
-   
-
-    #TODO: create is empty method
-    #is_empty() -> bool
+    

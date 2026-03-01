@@ -1,6 +1,9 @@
 from collections import deque
 import heapq
 class Queue:
+    def is_empty(self):
+        raise NotImplementedError
+
     def enqueue(self):
         raise NotImplementedError
     
@@ -21,6 +24,12 @@ class FIFOqueue(Queue):
     def dequeue(self):
         return self.queue.pop()
     
+    def is_empty(self):
+        if len(self.queue) == 0:
+            return True
+        else:
+            return False
+    
 class PriorityQueue(Queue):
     def __init__(self):
         super().__init__()
@@ -30,10 +39,18 @@ class PriorityQueue(Queue):
         return repr(self.queue)    
 
     def enqueue(self, patient):
-        heapq.heappush(self.queue, (patient.esi, patient.arrival_time, patient.severity, patient.patient_id))
+        heapq.heappush(self.queue, (patient.esi, patient.arrival_time, patient.severity, patient.patient_id,patient))
 
     def dequeue(self):
-        return heapq.heappop(self.queue)
+        esi, time, sev, id, patient = heapq.heappop(self.queue)
+        return patient
+    
+    def is_empty(self):
+        if len(self.queue) == 0:
+            return True
+        else:
+            return False
+
 
 class Stack:
     def __init__(self):
@@ -45,3 +62,9 @@ class Stack:
 
     def pop(self):
         return self.stack.pop()    
+    
+    def is_empty(self):
+        if len(self.stack) == 0:
+            return True
+        else:
+            return False

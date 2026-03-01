@@ -7,10 +7,11 @@ class Patient:
       Patient.id_count += 1
       self.patient_id = Patient.id_count
       self.arrival_time = simulation.clock
-      self.status = "WAITING_TRIAGE"
+      self.status = "ARRIVED"
       self.chief_complaint = complaints[random.randint(0,4)]
       self.severity = random.randint(1,10)
       self.esi = 0
+      self.bed_num = None
 
    def __str__(self):
       return f"Patient {self.patient_id}, status= {self.status}"   
