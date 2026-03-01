@@ -3,7 +3,9 @@ from ResourceManager import ResourceManager
 from QueueManager import QueueManager
 from TriagePolicy import TriagePolicy
 from StatsCollector import StatsCollector
-from Event import Event,Arrive
+from Event import Event,Arrive,events_log
+
+
 class Simulation:
     def __init__(self):
         self.clock = 0.0
@@ -27,7 +29,8 @@ class Simulation:
             print("\nTime is "+str(self.clock))
 
             event.execute()
-            
+
+        self.stats.fill_log(events_log) 
 
     def schedule(self, event, time):
         self.event_list.push(time,event)
