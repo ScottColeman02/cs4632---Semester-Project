@@ -5,19 +5,19 @@ Project Description: I plan to implement a DES that represents an Emergency Room
 Scott Coleman
 Team: Red Hot Data Analysts
 
-Project Status:
+# Project Status:
 
 The core functionalities of the simuation have been added. Simulations can be run and produce event log output. Features to come include Poisson Distirbution for arrivals ,statistics collection and output file creation, and triage policies. Given that my proposal lacked detailed explanation of specifities of classes I have implented several changes. These are mainly architectural and are explained in the Architecture Overview section.
 
-Installation Instructions:
+# Installation Instructions:
 
 To run the simulation users need at least Python 3.10 installed.The only way I have tested running the simulation is through VS Code. At this current stage in the development process I recommend that users do the same. Open the folder containing the program files in VS code.
 
-Usage: 
+# Usage: 
 
 To run the simulation program navigate to the Main.py file and run it. The main menu presents the options available. To select one enter the corresponding number and press enter. Before running the simulation it is important that you first choose option 1 and enter the simulation parameters. Once parameters have been assigned the simulation is ready to run. Upon entering option 2 you will be prompted to enter a file path for you event log file. At the end of the file path make sure to enter a valid file name followed by '.txt'. 
 
-Architecture Overview:
+# Architecture Overview:
 
 Main.py is something I decided to add to handle the implementation of the simulation. Users are prompted to enter parameters and run the simulation through a simple console menu. 
 
