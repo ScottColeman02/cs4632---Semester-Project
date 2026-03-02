@@ -3,7 +3,7 @@ from ResourceManager import ResourceManager
 from QueueManager import QueueManager
 from TriagePolicy import TriagePolicy
 from StatsCollector import StatsCollector
-from Event import Event,Arrive,events_log
+from Event import Arrive,events_log
 
 
 class Simulation:
@@ -18,6 +18,9 @@ class Simulation:
     
 
     def run(self):
+        file_path= input("Please enter a file path for the simulation results: ")
+        self.stats.event_log = open(file_path, "w")
+
         self.event_list.push(self.clock,Arrive(self))
         while not self.event_list.is_empty() and self.clock < self.max_time:
             time,id, event = self.event_list.pop()
@@ -26,7 +29,7 @@ class Simulation:
                 break
 
             self.clock = time
-            print("\nTime is "+str(self.clock))
+            print("\nTime is "+str(round(self.clock,2)))
 
             event.execute()
 
