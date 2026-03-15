@@ -23,6 +23,7 @@ while True:
             num_techs = int(input("Number of lab techs: "))
             num_beds = int(input("Number of beds: "))
             max_time = int(input("Simulation time: "))
+            mean_num_patients = float(input("Average # of patients: "))
 
             sim.resources.triage_nurses_available = num_triage_nurse
             sim.resources.providers_available = num_providers
@@ -30,6 +31,7 @@ while True:
             sim.resources.lab_techs_available = num_techs
             sim.resources.beds_available = num_beds
             sim.max_time = max_time
+            sim.mean_num_patients = mean_num_patients
 
             for i in range(num_triage_nurse):
                 triage_nurse = TriageNurse()
@@ -47,13 +49,11 @@ while True:
                 bed = Bed()
                 sim.resources.bed_stack.push(bed)
 
-            sim.max_time = max_time
 
             print()
             
         case "2":
             sim.run()
-
         case "3":
             sys.exit()
 

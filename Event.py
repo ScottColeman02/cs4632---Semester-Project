@@ -3,10 +3,12 @@ from QueueManager import QueueManager
 import random
 
 events_log = []
+
 class Event:
     def __init__(self,simulation):
         self.simulation = simulation
         self.patient_id = 0
+        
     
     def execute(self):
         raise NotImplementedError
@@ -18,6 +20,7 @@ class Arrive(Event):
 
     def execute(self):
         patient = Patient(self.simulation)
+        self.simulation.patient_count += 1
 
         events_log.append("\nPatient "+str(patient.patient_id)+" has arrived , time = "+str(self.simulation.clock))
         
@@ -26,7 +29,7 @@ class Arrive(Event):
 
         self.simulation.schedule(Start_Triage(self.simulation),self.simulation.clock)
 
-        self.simulation.schedule(Arrive(self.simulation),self.simulation.clock+random.uniform(0.0,10.0))
+        self.simulation.schedule(Arrive(self.simulation),self.simulation.clock+self.simulation.next_patient_arrival())
 
 class Start_Triage(Event):
     def __init__(self, simulation):

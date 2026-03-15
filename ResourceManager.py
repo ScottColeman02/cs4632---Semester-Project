@@ -43,6 +43,7 @@ class ResourceManager:
                     return False
 
                 nurse = self.nurse_stack.pop()
+                self.nurses_available -= 1
                 nurse.available = False
                 return nurse 
             case "tech":
@@ -52,6 +53,7 @@ class ResourceManager:
                     return False
 
                 tech = self.tech_stack.pop()
+                self.lab_techs_available -= 1
                 tech.available = False
                 return tech   
             case "bed":
@@ -61,6 +63,7 @@ class ResourceManager:
                     return False   
 
                 bed = self.bed_stack.pop()
+                self.beds_available -= 1
                 bed.available = False
                 return bed  
         

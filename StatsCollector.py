@@ -1,6 +1,6 @@
 class StatsCollector:
     def __init__(self):
-        self.event_log = open("/Users/scott/Library/CloudStorage/OneDrive-KennesawStateUniversity/Spring 2026/Modeling and Simulation/Semester Project/Test_Outputs/EVENT_LOG.txt","w")
+        self.event_log = "event_log.txt"
 
     #TODO: create method to record statistics
     #record()
@@ -13,12 +13,10 @@ class StatsCollector:
 
     def fill_log(self, events):
         try:
-            with open("self.event_log","w"):
+            with open(self.event_log,"w") as file:
                 for event in events:
-                    self.event_log.write(event)
-                    self.event_log.write("\n")
-
-            self.event_log.close()
+                    file.write(str(event))
+                    file.write("\n")
         except FileNotFoundError:
             print("no good")            
 
