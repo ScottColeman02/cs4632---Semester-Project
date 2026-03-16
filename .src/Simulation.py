@@ -5,10 +5,12 @@ from TriagePolicy import TriagePolicy
 from StatsCollector import StatsCollector
 from Event import Arrive,events_log
 import numpy as np
+import random
 
 
 class Simulation:
     def __init__(self):
+        self.sim_id = random.sample(range(0,9999),1)
         self.clock = 0.0
         self.event_list = EventList()
         self.resources = ResourceManager()
@@ -18,7 +20,13 @@ class Simulation:
         self.max_time = 0.0
         self.mean_num_patients = None
         self.rand = np.random.default_rng()
-        self.patient_count = 0    
+        self.patient_count = 0 
+        self.patients_fully_treated = 0
+        self.final_time = 0.0
+
+
+        #Simulation stat files
+        self.sim_stats = "SIM-"+str(self.sim_id)+'_stats.txt'
 
     def run(self):
        # file_path= input("Please enter a file path for the simulation results: ")
@@ -37,7 +45,8 @@ class Simulation:
             event.execute()
 
         self.stats.fill_log(events_log) 
-        print(str(self.patient_count))
+        self.final_time = self.clock
+        self.stats.fill_sim_stats(self)
 
     def schedule(self, event, time):
         self.event_list.push(time,event)
