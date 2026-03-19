@@ -46,7 +46,10 @@ class Start_Triage(Event):
         patient = self.simulation.queues.triage_queue.dequeue()
         patient.status = "IN_TRIAGE"
        
+        #calculate the wait time and store into triage wait times list
         patient.wait_calc('triage',self.simulation.clock)
+        self.simulation.stats.triage_waits.append(patient.triage_wait_time)
+
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being triaged by "+str(triage_nurse.emp_id)+", time = "+str(self.simulation.clock))
         
@@ -112,7 +115,10 @@ class Transfer_to_bed(Event):
             return None
         patient = self.simulation.queues.bed_queue.dequeue()
         patient.status = "TRANSFERING_TO_BED"
+
+        #calculate the wait time and store to bed wait time list
         patient.wait_calc('bed',self.simulation.clock)
+        self.simulation.stats.bed_waits.append(patient.bed_wait_time)
 
         nurse = self.simulation.resources.seize("nurse")
 
@@ -174,7 +180,10 @@ class Provider_Eval(Event):
 
         #update patient status
         patient.status = "EVAL"
+
+        #calculate the wait time
         patient.wait_calc('eval',self.simulation.clock)
+        self.simulation.stats.eval_waits.append(patient.eval_wait_time)
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being evaluated by "+str(provider.emp_id)+", time = "+str(self.simulation.clock))
 
@@ -241,6 +250,7 @@ class Going_to_Labs(Event):
         #update patient status
         patient.status = "GOING_TO_LAB"
         patient.wait_calc('labs',self.simulation.clock)
+        self.simulation.stats.labs_waits.append(patient.labs_wait_time)
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being transferred to labs by "+str(tech.emp_id)+", time = "+str(self.simulation.clock))
 
@@ -323,6 +333,7 @@ class Followup(Event):
         #update patient status
         patient.status = "FOLLOWUP"
         patient.wait_calc('followup',self.simulation.clock)
+        self.simulation.stats.followup_waits.append(patient.followup_wait_time)
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is receiving followup from "+str(provider.emp_id)+", time = "+str(self.simulation.clock))
 
@@ -390,6 +401,7 @@ class Discharge(Event):
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being discharged by "+str(nurse.emp_id)+", time = "+str(self.simulation.clock))
         patient.wait_calc('discharge', self.simulation.clock)
+        self.simulation.stats.discharge_waits.append(patient.discharge_wait_time)
 
         discharge_time = 5.0
 
@@ -408,6 +420,7 @@ class EndDischarge(Event):
         #update patient status
         patient.status = "DISCHARGED"
         patient.total_time = self.simulation.clock - patient.arrival_time
+        self.simulation.stats.total_times.append(patient.total_time)
 
         #Create patient time log containing wait times at each station and total time in ER
         self.simulation.stats.fill_wait_log(patient)
