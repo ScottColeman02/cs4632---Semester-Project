@@ -1,6 +1,12 @@
 import random
 
-complaints = ["HEADACHE", "CHEST_PAIN", "NAUSEA", "TRAUMA", "FEVER"]
+symptom_dict = {'CARDIAC':["CHEST_PAIN", "ARRYTHMIA","SHORT_BREATH"], 'RESP':["DIFF_BREATH", "CHEST_TIGHT", "COUGH"],
+                'NEURO':["SEIZURE", "CONFUSION","DIZZY","HEADACHE"], 'GASTRO': ['AB_PAIN', 'NAUSEA', 'DIAR'],
+                'TRAUMA': ['BROKE_BONE', 'CUTS', 'HEAD_INJ', 'BURNS'], 'INFECT': ['FEVER', 'CHILL', 'FATIGUE', 'BODY_ACHE'],
+                'MUSCULO': ['JOINT_PAIN', 'BACK_PAIN', 'SPRAIN'], 'TOXIC': ['OD', 'ALC_INTOX', 'HEATSTROKE', 'POISON'],
+                'PSYCH': ['SUICIDE_IDEA', 'PSYCHOSIS','ANXIETY']}
+symp_keys = symptom_dict.keys()
+
 class Patient:
    id_count = 0
    def __init__(self,simulation):
@@ -8,9 +14,15 @@ class Patient:
       self.patient_id = Patient.id_count
       self.arrival_time = simulation.clock
       self.total_time = 0.0
+      
       self.status = "ARRIVED"
-      self.chief_complaint = complaints[random.randint(0,4)]
-      self.severity = random.randint(1,10)
+      
+      #Assign patient chief complaint category and symptom as well as severity level
+      self.stats = self.get_symptoms()
+      self.comp_cat = self.stats[0]
+      self.chief_comp = self.stats[1]
+      self.severity = self.stats[2]
+
       self.esi = 0
       self.bed_num = None
 
@@ -39,6 +51,14 @@ class Patient:
       self.time_in_labs = 0.0
       self.time_in_followup = 0.0
       self.time_in_discharge = 0.0
+
+   #Method for getting patient complaint
+   def get_symptoms(self):
+      symp_cat = random.randint(0,9)
+      chief_comp = symptom_dict[symp_cat[random.randint(0,len(symp_cat[symp_cat]))]]
+      severity = random.randint(0,10)
+      
+      return symp_cat, chief_comp, severity
 
    def __str__(self):
       return f"Patient {self.patient_id}, status= {self.status}"   
