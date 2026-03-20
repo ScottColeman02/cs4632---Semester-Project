@@ -1,8 +1,8 @@
 import random
 
-symptom_dict = {'CARDIAC':["CHEST_PAIN", "ARRYTHMIA","SHORT_BREATH"], 'RESP':["DIFF_BREATH", "CHEST_TIGHT", "COUGH"],
-                'NEURO':["SEIZURE", "CONFUSION","DIZZY","HEADACHE"], 'GASTRO': ['AB_PAIN', 'NAUSEA', 'DIAR'],
-                'TRAUMA': ['BROKE_BONE', 'CUTS', 'HEAD_INJ', 'BURNS'], 'INFECT': ['FEVER', 'CHILL', 'FATIGUE', 'BODY_ACHE'],
+symptom_dict = {'CARDIAC':["CHEST_PAIN", "ARRYTHMIA","SHORT_BREATH"], 'RESP':["DIFF_BREATH", "CHEST_TIGHT", "WHEEZING"],
+                'NEURO':["SEIZURE", "CONFUSION","DIZZY","HEADACHE"], 'GASTRO': ['AB_PAIN', 'NAUSEA', 'DIARR'],
+                'TRAUMA': ['BROKE_BONE', 'CUTS', 'HEAD_INJ', 'BURNS'], 'INFECT': ['FEVER','COUGH', 'CHILL', 'FATIGUE', 'BODY_ACHE'],
                 'MUSCULO': ['JOINT_PAIN', 'BACK_PAIN', 'SPRAIN'], 'TOXIC': ['OD', 'ALC_INTOX', 'HEATSTROKE', 'POISON'],
                 'PSYCH': ['SUICIDE_IDEA', 'PSYCHOSIS','ANXIETY']}
 symp_keys = symptom_dict.keys()
@@ -22,6 +22,8 @@ class Patient:
       self.comp_cat = self.stats[0]
       self.chief_comp = self.stats[1]
       self.severity = self.stats[2]
+
+      self.conscious = None
 
       self.esi = 0
       self.bed_num = None
