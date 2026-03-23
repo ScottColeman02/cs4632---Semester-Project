@@ -15,11 +15,8 @@ class TriagePolicy:
         chief_comp = patient.chief_comp
         sev = patient.severity
 
-        esi = None
-        
-
         if comp_cat in base_2:
-            patient.conscious = random.choice(True,False)
+            patient.conscious = random.choice([True,False])
             if not patient.conscious:
                 return 1, random.uniform(0,2)
             if chief_comp in base_2_inv and (sev >= 4 and sev <= 6):
@@ -28,10 +25,10 @@ class TriagePolicy:
                 return 4, random.uniform(2,4)
         elif comp_cat in base_3:
             if sev >= 7:
-                esi = 2
+                return 2, random.uniform(1,3)
             elif sev <=3:
-                esi = 4
-            esi = 3
+                return random.randint(4,5), random.uniform(4,6)
+            
+        return random.randint(2,4), random.uniform(4,6)
 
-        return esi
     

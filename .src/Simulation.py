@@ -20,9 +20,14 @@ class Simulation:
         self.max_time = 0.0
         self.mean_num_patients = None
         self.rand = np.random.default_rng()
+
+        #Core statistics attributes
         self.patient_count = 0 
         self.patients_fully_treated = 0
         self.final_time = 0.0
+        self.num_admit = 0
+        self.num_discharge = 0
+        self.num_labs = 0
 
 
         #Simulation stat files
@@ -40,7 +45,6 @@ class Simulation:
                 break
 
             self.clock = time
-            print("\nTime is "+str(round(self.clock,2)))
 
             event.execute()
 

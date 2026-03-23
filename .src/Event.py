@@ -4,6 +4,13 @@ import random
 
 events_log = []
 
+high_sev = {"CHEST_PAIN", "ARRYTHMIA","SHORT_BREATH","DIFF_BREATH", "CHEST_TIGHT", "WHEEZING","SEIZURE",
+             "CONFUSION","DIZZY",'AB_PAIN', 'CUTS', 'HEAD_INJ','OD', 'ALC_INTOX', 'HEATSTROKE', 'POISON'}
+med_sev = {'FEVER','COUGH', 'CHILL', 'FATIGUE', 'BODY_ACHE','NAUSEA', 'DIARR','BROKE_BONE'}
+low_sev = {'JOINT_PAIN', 'BACK_PAIN', 'SPRAIN'}
+
+lab_time_range = {'CARDIAC': (45, 90), "RESP": (30, 75), "NEURO": (45, 90), "GASTRO": (40, 80),
+    "TRAUMA": (30, 75), "INFECT": (45, 120), "MUSCULO": (25, 60), "TOXIC": (45, 100),"PSYCH": (35, 80)}
 class Event:
     def __init__(self,simulation):
         self.simulation = simulation
@@ -53,27 +60,11 @@ class Start_Triage(Event):
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being triaged by "+str(triage_nurse.emp_id)+", time = "+str(self.simulation.clock))
         
-        ###TODO: convert this to a match statement###
 
-        if(patient.severity >= 9 or patient.chief_complaint == "CHEST_PAIN"):
-            patient.esi = 1
-            self.triage_time = random.uniform(8.0,10.0)
-        elif(patient.severity >= 7 and patient.severity <= 8):
-            patient.esi = 2
-            self.triage_time = random.uniform(6.0,8.0)
+        self.triage_stats = self.simulation.triage_policy.standard_esi(patient)
+        patient.esi = self.triage_stats[0]
+        self.triage_time = self.triage_stats[1]
 
-        elif(patient.severity >= 5 and patient.severity <= 6):
-            patient.esi = 3
-            self.triage_time = random.uniform(4.0,6.0)
-
-        elif(patient.severity >= 3 and patient.severity <= 4):
-            patient.esi = 4
-            self.triage_time = random.uniform(2.0,6.0)
-
-        elif(patient.severity >= 1 and patient.severity <= 2):
-            patient.esi = 5
-            self.triage_time = random.uniform(0.0,2.0)
- 
         self.simulation.schedule(End_Triage(self.simulation,patient, triage_nurse),self.simulation.clock+self.triage_time)
            
 
@@ -187,7 +178,17 @@ class Provider_Eval(Event):
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is being evaluated by "+str(provider.emp_id)+", time = "+str(self.simulation.clock))
 
-        eval_time = random.uniform(0.0,8.0)
+        match patient.esi:
+            case 1:
+                eval_time = random.uniform(2,5)
+            case 2:
+                eval_time = random.uniform(5,12)
+            case 3:
+                eval_time = random.uniform(13,17)
+            case 4:
+                eval_time = random.uniform(7,15)
+            case 5:
+                eval_time = random.uniform(5,8)
 
         self.simulation.schedule(EndEval(self.simulation, patient, provider),self.simulation.clock+eval_time)
 
@@ -203,17 +204,35 @@ class EndEval(Event):
         patient = self.patient
         provider = self.provider
 
-        #for now whether a patient needs labs is decided by coin toss
-        needs_labs = random.randint(0,1)
+        #Establish a baseline probability for if a patient needs labs based on chief complaint
+        labs_prob = 0.0
+        if patient.chief_comp in high_sev:
+            labs_prob = 0.5
+        elif patient.chief_comp in med_sev:
+            labs_prob = 0.35
+        elif patient.chief_comp in low_sev:
+            labs_prob = 0.20
+
+        #Adjust based on ESI level
+        if patient.esi <= 2:
+            labs_prob += 0.35
+        
+        if patient.severity >= 6:
+            labs_prob += 0.15
+
+        patient.needs_labs = random.random() < labs_prob
+
 
         self.simulation.resources.release("provider",provider)
 
         self.simulation.schedule(Provider_Eval(self.simulation),self.simulation.clock)
-        self.simulation.schedule(Followup(self.simulation),self.simulation.clock)
+        
 
-        if needs_labs == 1:
+        if patient.needs_labs:
             patient.status = "WAITING_LABS"
             patient.labs_wait_enter = self.simulation.clock
+
+            self.simulation.num_labs += 1
 
             self.simulation.queues.lab_queue.enqueue(patient)
 
@@ -275,8 +294,8 @@ class Labs(Event):
 
         events_log.append("\nPatient "+str(patient.patient_id)+" is in labs, time = "+str(self.simulation.clock))
 
-
-        time_in_lab = random.uniform(0.0,10.0)
+        a, b = lab_time_range[patient.comp_cat]
+        time_in_lab = random.uniform(a,b)
 
         self.simulation.schedule(Leave_Lab(self.simulation,patient,tech,time_to_lab),self.simulation.clock+time_in_lab)
         
@@ -311,7 +330,7 @@ class Leave_Lab(Event):
         events_log.append("\nPatient "+str(patient.patient_id)+" is waiting for followup, time = "+str(self.simulation.clock))
 
 
-        self.simulation.schedule(Followup(self.simulation),self.simulation.clock+time_to_lab)
+        self.simulation.schedule(Followup(self.simulation),self.simulation.clock)
 
 class Followup(Event):
     def __init__(self, simulation):
@@ -353,14 +372,27 @@ class EndFollowup(Event):
         patient = self.patient
         provider = self.provider
 
-        admit = random.randint(0,1)
+        
+        match patient.esi:
+            case 1:
+                admit_prob = 0.9
+            case 2:
+                admit_prob = 0.70
+            case 3:
+                admit_prob = 0.45
+            case 4:
+                admit_prob = 0.20
+            case 5:
+                admit_prob = 0.05
+
+        admit = random.random() < admit_prob
 
         self.simulation.resources.release("provider",provider)
 
         self.simulation.schedule(Provider_Eval(self.simulation),self.simulation.clock)
         self.simulation.schedule(Followup(self.simulation),self.simulation.clock)
 
-        if admit == 1:
+        if admit:
             self.simulation.resources.release("bed", patient.bed_num)
             self.simulation.schedule(Transfer_to_bed(self.simulation),self.simulation.clock)
 
@@ -369,6 +401,7 @@ class EndFollowup(Event):
             patient.status = "ADMITTED"
 
             self.simulation.patients_fully_treated += 1
+            self.simulation.num_admit += 1
             events_log.append("\nPatient "+str(patient.patient_id)+" is waiting to be admitted, time = "+str(self.simulation.clock))
 
             
@@ -423,7 +456,7 @@ class EndDischarge(Event):
         self.simulation.stats.total_times.append(patient.total_time)
 
         #Create patient time log containing wait times at each station and total time in ER
-        self.simulation.stats.fill_wait_log(patient)
+        #self.simulation.stats.fill_wait_log(patient)
 
         #release the nurse and bed resources
         self.simulation.resources.release("nurse", nurse)
@@ -432,6 +465,7 @@ class EndDischarge(Event):
         events_log.append("\nPatient "+str(patient.patient_id)+" has been discharged, time = "+str(self.simulation.clock))
 
         self.simulation.patients_fully_treated += 1
+        self.simulation.num_discharge += 1
 
         self.simulation.schedule(Transfer_to_bed(self.simulation),self.simulation.clock)
         self.simulation.schedule(Discharge(self.simulation),self.simulation.clock)

@@ -5,7 +5,7 @@ symptom_dict = {'CARDIAC':["CHEST_PAIN", "ARRYTHMIA","SHORT_BREATH"], 'RESP':["D
                 'TRAUMA': ['BROKE_BONE', 'CUTS', 'HEAD_INJ', 'BURNS'], 'INFECT': ['FEVER','COUGH', 'CHILL', 'FATIGUE', 'BODY_ACHE'],
                 'MUSCULO': ['JOINT_PAIN', 'BACK_PAIN', 'SPRAIN'], 'TOXIC': ['OD', 'ALC_INTOX', 'HEATSTROKE', 'POISON'],
                 'PSYCH': ['SUICIDE_IDEA', 'PSYCHOSIS','ANXIETY']}
-symp_keys = symptom_dict.keys()
+symp_keys = list(symptom_dict.keys())
 
 class Patient:
    id_count = 0
@@ -22,6 +22,8 @@ class Patient:
       self.comp_cat = self.stats[0]
       self.chief_comp = self.stats[1]
       self.severity = self.stats[2]
+
+      self.needs_labs = False
 
       self.conscious = None
 
@@ -56,8 +58,8 @@ class Patient:
 
    #Method for getting patient complaint
    def get_symptoms(self):
-      symp_cat = random.randint(0,9)
-      chief_comp = symptom_dict[symp_cat[random.randint(0,len(symp_cat[symp_cat]))]]
+      symp_cat = random.choice(symp_keys)
+      chief_comp = random.choice(symptom_dict[symp_cat])
       severity = random.randint(0,10)
       
       return symp_cat, chief_comp, severity
