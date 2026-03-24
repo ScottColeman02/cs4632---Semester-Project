@@ -14,3 +14,5 @@ class QueueManager:
         self.lab_queue = FIFOqueue()
         self.inpatient_bed_queue = FIFOqueue()
         self.discharge_queue = FIFOqueue()
+
+    

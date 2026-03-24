@@ -19,6 +19,7 @@ class StatsCollector:
     #TODO: create method to investigate simulation statistics
     #get_report() -> statistics
 
+
     def fill_log(self, events):
         try:
             with open(self.event_log,"w") as file:
@@ -73,7 +74,7 @@ class StatsCollector:
                 file.write('===============================\n')
 
                 #Write the wait time statistics for each station
-                file.write('\n=====Wait Time Statistics=====\n')
+                file.write('\n==========Wait Time Statistics==========\n')
 
                 file.write('Min Triage wait time: '+str(np.min(self.triage_waits))+'\n')
                 file.write('Average Triage wait time: '+str(np.mean(self.triage_waits))+'\n')
@@ -99,6 +100,33 @@ class StatsCollector:
                 file.write('Average Discharge wait time: '+str(np.mean(self.discharge_waits))+'\n')
                 file.write('Max Discharge wait time: '+str(np.max(self.discharge_waits))+'\n')
 
-                file.write('================================')
+                file.write('====================================\n')
+                file.write('==========Queue Statistics==========\n')
+
+                file.write('Min length of triage queue: '+str(np.min(simulation.triage_queue_len))+'\n')
+                file.write('Average length of triage queue: '+str(np.mean(simulation.triage_queue_len))+'\n')
+                file.write('Max length of triage queue: '+str(np.max(simulation.triage_queue_len))+'\n')
+
+                file.write('\nMin length of bed queue: '+str(np.min(simulation.bed_queue_len))+'\n')
+                file.write('Average length of bed queue: '+str(np.mean(simulation.bed_queue_len))+'\n')
+                file.write('Max length of bed queue: '+str(np.max(simulation.bed_queue_len))+'\n')
+
+                file.write('\nMin length of provider evaluation queue: '+str(np.min(simulation.eval_queue_len))+'\n')
+                file.write('Average length of provider evaluation queue: '+str(np.mean(simulation.eval_queue_len))+'\n')
+                file.write('Max length of provider evaluation queue: '+str(np.max(simulation.eval_queue_len))+'\n')
+
+                file.write('\nMin length of labs queue: '+str(np.min(simulation.labs_queue_len))+'\n')
+                file.write('Average length of labs queue: '+str(np.mean(simulation.labs_queue_len))+'\n')
+                file.write('Max length of labs queue: '+str(np.max(simulation.labs_queue_len))+'\n')
+
+                file.write('\nMin length of provider followup queue: '+str(np.min(simulation.followup_queue_len))+'\n')
+                file.write('Average length of provider followup queue: '+str(np.mean(simulation.followup_queue_len))+'\n')
+                file.write('Max length of provider followup queue: '+str(np.max(simulation.followup_queue_len))+'\n')
+
+                file.write('\nMin length of discharge queue: '+str(np.min(simulation.discharge_queue_len))+'\n')
+                file.write('Average length of discharge queue: '+str(np.mean(simulation.discharge_queue_len))+'\n')
+                file.write('Max length of discharge queue: '+str(np.max(simulation.discharge_queue_len))+'\n')
+
+                file.write('====================================')
         except FileNotFoundError:
             print("Error: No good writing "+str(simulation.sim_id)+" stats file.")
