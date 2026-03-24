@@ -9,6 +9,9 @@ class Queue:
     
     def dequeue(self):
         raise NotImplementedError
+    
+    def length(self):
+        raise NotImplementedError
 
 class FIFOqueue(Queue):
     def __init__(self):
@@ -17,6 +20,9 @@ class FIFOqueue(Queue):
 
     def __repr__(self):
         return repr(self.queue)  
+    
+    def __len__(self):
+        return len(self.queue)
     
     def enqueue(self,item):
         self.queue.appendleft(item)
@@ -37,6 +43,9 @@ class PriorityQueue(Queue):
 
     def __repr__(self):
         return repr(self.queue)    
+    
+    def __len__(self):
+        return len(self.queue)
 
     def enqueue(self, patient):
         heapq.heappush(self.queue, (patient.esi, patient.arrival_time, patient.severity, patient.patient_id,patient))

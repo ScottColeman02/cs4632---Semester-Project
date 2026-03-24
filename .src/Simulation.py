@@ -30,12 +30,12 @@ class Simulation:
         self.num_labs = 0
 
         #Lists to store queue lengths throughout the simulation
-        triage_queue_len = []
-        bed_queue_len = []
-        eval_queue_len = []
-        labs_queue_len = []
-        followup_queue_len = []
-        discharge_queue_len = []
+        self.triage_queue_len = []
+        self.bed_queue_len = []
+        self.eval_queue_len = []
+        self.labs_queue_len = []
+        self.followup_queue_len = []
+        self.discharge_queue_len = []
 
 
         #Simulation stat files

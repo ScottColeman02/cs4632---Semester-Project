@@ -7,7 +7,7 @@ class QueueManager:
 
         #Waiting room queue also implemented as priority queue
         self.bed_queue = PriorityQueue()
-        self.provider_queue = PriorityQueue()
+        self.eval_queue = PriorityQueue()
         self.followup_queue = PriorityQueue()
 
         #lab and inpatient bed queues implemented as standard FIFO queues.
