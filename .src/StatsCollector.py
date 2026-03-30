@@ -1,7 +1,11 @@
 import numpy as np
+import csv
+import json
+import datetime
+
 class StatsCollector:
     def __init__(self):
-        self.event_log = "event_log.txt"
+        #Lists to store wait times 
         self.triage_waits = []
         self.bed_waits = []
         self.eval_waits = []
@@ -9,124 +13,196 @@ class StatsCollector:
         self.followup_waits = []
         self.discharge_waits = []
         self.total_times = []
+        
+    def sim_state(self, simulation, sim_time=None):
+        if sim_time is None:
+            sim_time = simulation.clock
 
-    #TODO: create method to record statistics
-    #record()
+        status_counts = {}
+        for pat in simulation.patients:
+            status = pat.status
+            status_counts[status] = status_counts.get(status, 0) + 1
 
-    #TODO: create method to get the final time for a patient
-    #finalize_time(p_id, time) -> float
+        row = {
+            'SIM_ID': simulation.sim_id,
+            'Simulation clock': round(sim_time, 2),
 
-    #TODO: create method to investigate simulation statistics
-    #get_report() -> statistics
+            'Total patients in ER': simulation.patient_count,
+            '# of patients fully treated': simulation.patients_fully_treated,
+            '# of patients admitted': simulation.num_admit,
+            '# of patients discharged': simulation.num_discharge,
+            '# of patients needing labs': simulation.num_labs,
 
+            'Triage Queue Length': len(simulation.queues.triage_queue),
+            'Bed Queue Length': len(simulation.queues.bed_queue),
+            'Eval Queue Length': len(simulation.queues.eval_queue),
+            'Labs Queue Length': len(simulation.queues.lab_queue),
+            'Followup Queue Length': len(simulation.queues.followup_queue),
+            'Discharge Queue Length': len(simulation.queues.discharge_queue),
 
-    def fill_log(self, events):
+            'Triage Nurses Available': simulation.resources.triage_nurses_available,
+            'Nurses Available': simulation.resources.nurses_available,
+            'Providers Available': simulation.resources.providers_available,
+            'Techs Available': simulation.resources.lab_techs_available,
+            'Beds Available': simulation.resources.beds_available,
+
+            'WAITING_TRIAGE': status_counts.get('WAITING_TRIAGE', 0),
+            'IN_TRIAGE': status_counts.get('IN_TRIAGE', 0),
+            'WAITING_BED': status_counts.get('WAITING_BED', 0),
+            'TRANSFERRING_TO_BED': status_counts.get('TRANSFERRING_TO_BED', 0),
+            'WAITING_EVAL': status_counts.get('WAITING_EVAL', 0),
+            'PROVIDER_EVAL': status_counts.get('PROVIDER_EVAL', 0),
+            'WAITING_LABS': status_counts.get('WAITING_LABS', 0),
+            'GOING_TO_LABS': status_counts.get('GOING_TO_LABS', 0),
+            'IN_LABS': status_counts.get('IN_LABS', 0),
+            'WAITING_FOLLOWUP': status_counts.get('WAITING_FOLLOWUP', 0),
+            'FOLLOWUP': status_counts.get('FOLLOWUP', 0),
+            'WAITING_DISCHARGE': status_counts.get('WAITING_DISCHARGE', 0),
+            'DISCHARGED': status_counts.get('DISCHARGED', 0),
+            'ADMITTED': status_counts.get('ADMITTED', 0),
+        }
+
+        simulation.sim_states.append(row)
+
+    def fill_sim_state_stats(self, simulation):
+        if not simulation.sim_states:
+            return
+
+        fieldnames = list(simulation.sim_states[0].keys())
+
         try:
-            with open(self.event_log,"w") as file:
-                for event in events:
-                    file.write(str(event))
-                    file.write("\n")
+            with open(simulation.sim_state_stats, 'w', newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(simulation.sim_states)
+        except FileNotFoundError:
+            print('Error: No good writing time series.')
+
+    def fill_log(self,simulation):
+        try:
+            with open(simulation.event_log,"w", newline="") as file:
+                writer = csv.writer(file)
+
+                writer.writerow(['Time', 'Patient_ID','ESI', 'Event', 'Resource_ID', 'Patient Status'])
+
+                for event in simulation.events_log:
+                    writer.writerow([event[0],event[1],event[2],event[3],event[4],event[5]])
         except FileNotFoundError:
             print("Error: No good writing event log.")            
 
-    #Method to fill wait time log for individual patients
-    def fill_wait_log(self, patient):
+    #Method to the patient stats file
+    def fill_pat_stats(self,simulation):
         try:
-            with open(patient.wait_time_log,"w") as file:
-                file.write("=====Patient Time Log=====\n")
-                file.write("Triage wait time: "+str(patient.triage_wait_time)+'\n')
-                file.write("Bed wait time: "+str(patient.bed_wait_time)+'\n')
-                file.write("Provider eval wait time: "+str(patient.eval_wait_time)+'\n')
-                file.write("Labs wait time: ")
-                if patient.labs_wait_time is None:
-                    file.write("N/A\n")
-                else:
-                    file.write(str(patient.labs_wait_time)+'\n')
-                file.write("Provider followup wait time: ")
-                if patient.followup_wait_time is None:
-                    file.write("N/A\n")
-                else:
-                    file.write(str(patient.followup_wait_time)+'\n')
-                file.write("Discharge wait time: "+str(patient.discharge_wait_time)+'\n')
-                file.write('===============\n')
-                file.write(str(patient.total_time))
+            with open(simulation.pat_stats,"w",newline="") as file:
+                writer = csv.writer(file)
+
+                writer.writerow(['Patient_ID','Complaint Category','Chief Complaint','Severity','ESI', 'Needed Labs',
+                                 'Triage Wait','Bed Wait', 'Eval Wait', 'Labs Wait',
+                                  'Followup Wait', 'Discharge Wait', 'Total Time in ER'])
+                for pat in simulation.patients:
+                    writer.writerow([pat.patient_id,pat.comp_cat,pat.chief_comp,pat.severity,pat.esi,pat.needs_labs
+                                     ,pat.triage_wait_time,pat.bed_wait_time,pat.eval_wait_time,pat.labs_wait_time
+                                     ,pat.followup_wait_time,pat.discharge_wait_time,pat.total_time])
+               
         except FileNotFoundError:
-            print("Error: No good writing "+str(patient.patient_id)+" time log.")           
+            print("Error: No good writing patient stats.")           
 
     #Method to fill the simulation stats file
-    def fill_sim_stats(self, simulation):
+    def fill_summ_stats(self, simulation):
+        def avg_available(key):
+            return np.mean([row[key] for row in simulation.sim_states])
+        sim_summ = {'SIM_ID':simulation.sim_id,
+                    
+                    'Parameters':{
+                        '# of triage nurses': simulation.num_tn,
+                        '# of Providers': simulation.num_p,
+                        '# of Nurses': simulation.num_n,
+                        '# of Techs': simulation.num_t,
+                        '# of Beds': simulation.num_b,
+
+                        'Sim time': simulation.max_time,
+                        'Patient arrival rate': simulation.mean_num_patients,
+                        'Random seed': simulation.rand_seed 
+                    },
+                    'Results': {
+                        'Total # of patients': simulation.patient_count,
+                        '# of patients fully treated': simulation.patients_fully_treated,
+                        '# of patients admitted': simulation.num_admit,
+                        '# of patients discharged': simulation.num_discharge,
+                        '% of patients needed labs': round((simulation.num_labs / simulation.patient_count)*100, 2),
+
+                        'Completion rate': round((simulation.patients_fully_treated / simulation.patient_count)*100, 2),
+                        'Throughput': round((simulation.patients_fully_treated / simulation.final_time)*60, 2),
+                        'Total events processed': len(simulation.events_log),
+
+                        'Triage nurse utilization %': round((1 - avg_available('Triage Nurses Available') / simulation.num_tn)*100, 2),
+                        'Nurse utilization %': round((1 - avg_available('Nurses Available') / simulation.num_n)*100, 2),
+                        'Provider utilization %': round((1 - avg_available('Providers Available') / simulation.num_p)*100, 2),
+                        'Tech utilization %': round((1 - avg_available('Techs Available') / simulation.num_t)*100, 2),
+                        'Bed utilization %': round((1 - avg_available('Beds Available') / simulation.num_b)*100, 2),
+
+                        'Avg total time in ER': float(np.mean(self.total_times)),
+                        'Median total time in ER': float(np.median(self.total_times)),
+                        'Final simulation time': simulation.final_time
+                    }
+                }
+        sim_summ.update(self.comp_wait_stats(simulation))
+        sim_summ.update(self.comp_queue_stats(simulation))
         try:
-            with open(simulation.sim_stats,'w') as file:
-                file.write("=====Core Simulation Statistics=====\n")
-                file.write("# of patients: "+str(simulation.patient_count)+'\n')
-                file.write("# of patients fully treated: "+str(simulation.patients_fully_treated)+'\n')
-                file.write('% of patients discharged: '+str(round((simulation.num_discharge / simulation.patient_count)*100,2))+'%\n')
-                file.write('% of patients admitted: '+str(round((simulation.num_admit / simulation.patient_count)*100,2))+'%\n')
-                file.write("Completion rate: "+str(round((simulation.patients_fully_treated/simulation.patient_count)*100,2))+'%\n')
+            with open(simulation.summ_stats,'w') as file:
+                json.dump(sim_summ,file,indent=4)
+        except FileExistsError:
+            print('no good so sorry')    
+    
+    def comp_queue_stats(self, simulation):
+        queues = {
+            'Triage': simulation.triage_queue_len,
+            'Bed': simulation.bed_queue_len,
+            'Eval': simulation.eval_queue_len,
+            'Labs': simulation.labs_queue_len,
+            'Followup': simulation.followup_queue_len,
+            'Discharge': simulation.discharge_queue_len
+        }
+        
 
-                file.write('\n% needing labs: '+str(round((simulation.num_labs / simulation.patient_count)*100, 2))+'\n')
+        queue_stats = {}
 
-                file.write('\nAverage total patient time in ER: '+str(round(np.mean(self.total_times),2))+'\n')
-                file.write('Median total patient time in ER: '+str(round(np.median(self.total_times),2))+'\n')
-                file.write('Min total patient time in ER: '+str(round(np.min(self.total_times),2))+'\n')
-                file.write('Max total patient time in ER: '+str(round(np.max(self.total_times),2))+'\n')
-                file.write("Total simulation time: "+str(round(simulation.final_time,2))+'\n')
-                file.write('===============================\n')
+        for name, data in queues.items():
+            if data:
+                queue_stats[name] = {"Avg": float(np.mean(data)),
+                                    "Min": int(np.min(data)),
+                                    "Max": int(np.max(data))}
+            else:
+                queue_stats[name] = {"Avg": None,
+                                    "Min": None,
+                                    "Max": None}
+        
+        return {'Queue Length Stats':queue_stats}
+    
+    def comp_wait_stats(self, simulation):
+        wait_times = {
+            'Triage': self.triage_waits,
+            'Bed': self.bed_waits,
+            'Eval': self.eval_waits,
+            'Labs': self.labs_waits,
+            'Followup': self.followup_waits,
+            'Discharge': self.discharge_waits
+        }
 
-                #Write the wait time statistics for each station
-                file.write('\n==========Wait Time Statistics==========\n')
+        queue_stats = {}
 
-                file.write('Min Triage wait time: '+str(np.min(self.triage_waits))+'\n')
-                file.write('Average Triage wait time: '+str(np.mean(self.triage_waits))+'\n')
-                file.write('Max Triage wait time: '+str(np.max(self.triage_waits))+'\n')
+        for name, data in wait_times.items():
+            clean_waits = [i for i in data if i is not None]
+            if data:
+                queue_stats[name] = {"Avg": float(np.mean(clean_waits)),
+                                    "Min": int(np.min(clean_waits)),
+                                    "Max": int(np.max(clean_waits))}
+            else:
+                queue_stats[name] = {"Avg": None,
+                                    "Min": None,
+                                    "Max": None}
+        
+        return {'Queue Wait Time Stats':queue_stats}
 
-                file.write('\nMin Bed wait time: '+str(np.min(self.bed_waits))+'\n')
-                file.write('Average Bed wait time: '+str(np.mean(self.bed_waits))+'\n')
-                file.write('Max Bed wait time: '+str(np.max(self.bed_waits))+'\n')
+        
 
-                file.write('\nMin Evaluation wait time: '+str(np.min(self.eval_waits))+'\n')
-                file.write('Average Evaluation wait time: '+str(np.mean(self.eval_waits))+'\n')
-                file.write('Max Evaluation wait time: '+str(np.max(self.eval_waits))+'\n')
-
-                file.write('\nMin Labs wait time: '+str(np.min(self.labs_waits))+'\n')
-                file.write('Average Labs wait time: '+str(np.mean(self.labs_waits))+'\n')
-                file.write('Max Labs wait time: '+str(np.max(self.labs_waits))+'\n')
-
-                file.write('\nMin Followup wait time: '+str(np.min(self.followup_waits))+'\n')
-                file.write('Average Followup wait time: '+str(np.mean(self.followup_waits))+'\n')
-                file.write('Max Followup wait time: '+str(np.max(self.followup_waits))+'\n')
-
-                file.write('\nMin Discharge wait time: '+str(np.min(self.discharge_waits))+'\n')
-                file.write('Average Discharge wait time: '+str(np.mean(self.discharge_waits))+'\n')
-                file.write('Max Discharge wait time: '+str(np.max(self.discharge_waits))+'\n')
-
-                file.write('====================================\n')
-                file.write('==========Queue Statistics==========\n')
-
-                file.write('Min length of triage queue: '+str(np.min(simulation.triage_queue_len))+'\n')
-                file.write('Average length of triage queue: '+str(np.mean(simulation.triage_queue_len))+'\n')
-                file.write('Max length of triage queue: '+str(np.max(simulation.triage_queue_len))+'\n')
-
-                file.write('\nMin length of bed queue: '+str(np.min(simulation.bed_queue_len))+'\n')
-                file.write('Average length of bed queue: '+str(np.mean(simulation.bed_queue_len))+'\n')
-                file.write('Max length of bed queue: '+str(np.max(simulation.bed_queue_len))+'\n')
-
-                file.write('\nMin length of provider evaluation queue: '+str(np.min(simulation.eval_queue_len))+'\n')
-                file.write('Average length of provider evaluation queue: '+str(np.mean(simulation.eval_queue_len))+'\n')
-                file.write('Max length of provider evaluation queue: '+str(np.max(simulation.eval_queue_len))+'\n')
-
-                file.write('\nMin length of labs queue: '+str(np.min(simulation.labs_queue_len))+'\n')
-                file.write('Average length of labs queue: '+str(np.mean(simulation.labs_queue_len))+'\n')
-                file.write('Max length of labs queue: '+str(np.max(simulation.labs_queue_len))+'\n')
-
-                file.write('\nMin length of provider followup queue: '+str(np.min(simulation.followup_queue_len))+'\n')
-                file.write('Average length of provider followup queue: '+str(np.mean(simulation.followup_queue_len))+'\n')
-                file.write('Max length of provider followup queue: '+str(np.max(simulation.followup_queue_len))+'\n')
-
-                file.write('\nMin length of discharge queue: '+str(np.min(simulation.discharge_queue_len))+'\n')
-                file.write('Average length of discharge queue: '+str(np.mean(simulation.discharge_queue_len))+'\n')
-                file.write('Max length of discharge queue: '+str(np.max(simulation.discharge_queue_len))+'\n')
-
-                file.write('====================================')
-        except FileNotFoundError:
-            print("Error: No good writing "+str(simulation.sim_id)+" stats file.")

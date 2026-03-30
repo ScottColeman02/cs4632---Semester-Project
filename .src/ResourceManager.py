@@ -1,12 +1,15 @@
 from DataStructures import Stack
 class ResourceManager:
-    triage_nurse_stack = Stack()
-    provider_stack = Stack()
-    nurse_stack = Stack()
-    tech_stack = Stack()
-    bed_stack = Stack()
+    
 
     def __init__(self):
+        self.triage_nurse_stack = Stack()
+        self.provider_stack = Stack()
+        self.nurse_stack = Stack()
+        self.tech_stack = Stack()
+        self.bed_stack = Stack()
+
+        
         self.triage_nurses_available = 0
         self.nurses_available = 0
         self.beds_available = 0

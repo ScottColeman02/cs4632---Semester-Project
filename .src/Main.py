@@ -1,15 +1,25 @@
 from Simulation import Simulation
-from Patient import Patient
 from Event import *
 from Resource import *
-import sys
+from Patient import *
 
-sim = Simulation()
+sims = []
+def val_input(prompt):
+    while True:
+        try:
+            val = int(input(prompt))
+            if val < 1:
+                print('Please enter a value >= 1.')
+            else:
+                return val
+        except ValueError:
+            print('Invalid input.')    
+
 
 while True:
     print("==========ER Simulation==========")
-    print("1. Enter simulation parameters")
-    print("2. Run simulation")
+    print("1. Create a new simulation")
+    print("2. Run a simulation")
     print("3. Exit")
     choice = input("Please make a selection: ")
     print()
@@ -17,62 +27,74 @@ while True:
     match choice:
         case "1":
             sim_name = input('Please enter a name for the simulation: ')
-            sim_name = Simulation()
+            print()
 
-            num_triage_nurse = int(input("Number of triage nurses: "))
-            num_providers = int(input("Number of providers: "))
-            num_nurses = int(input("Number of nurses: "))
-            num_techs = int(input("Number of lab techs: "))
-            num_beds = int(input("Number of beds: "))
-            max_time = int(input("Simulation time: "))
-            mean_num_patients = float(input("Average # of patients: "))
+            num_triage_nurse = val_input("Number of triage nurses: ")
+            num_providers = val_input("Number of providers: ")
+            num_nurses = val_input("Number of nurses: ")
+            num_techs = val_input("Number of lab techs: ")
+            num_beds = val_input("Number of beds: ")
+            print()
 
-            sim_name.resources.triage_nurses_available = num_triage_nurse
-            sim_name.resources.providers_available = num_providers
-            sim_name.resources.nurses_available = num_nurses
-            sim_name.resources.lab_techs_available = num_techs
-            sim_name.resources.beds_available = num_beds
-            sim_name.max_time = max_time
-            sim_name.mean_num_patients = mean_num_patients
+            max_time = val_input("Simulation time: ")
+            mean_num_patients = float(val_input("Average # of patients: "))
+            rand_seed = int(input('Please enter a random seed (-1 for random selection): '))
+            sim_state_interv = int(input('Please enter an interval to record simulation state statistics: '))
+
+            Patient.id_count = 0
+            Resource.staff_id_count = 0
+            Resource.bed_id_count = 0
+            sim = Simulation(sim_name,num_triage_nurse,num_nurses,num_providers,num_techs,num_beds,
+                             max_time,mean_num_patients,rand_seed,sim_state_interv)
+            sims.append(sim)
+            
+            
+            sim.resources.triage_nurses_available = num_triage_nurse
+            sim.resources.providers_available = num_providers
+            sim.resources.nurses_available = num_nurses
+            sim.resources.lab_techs_available = num_techs
+            sim.resources.beds_available = num_beds
+
+            
 
             for i in range(num_triage_nurse):
                 triage_nurse = TriageNurse()
-                sim_name.resources.triage_nurse_stack.push(triage_nurse)
+                sim.resources.triage_nurse_stack.push(triage_nurse)
             for i in range(num_providers):
                 provider = Provider()
-                sim_name.resources.provider_stack.push(provider)
+                sim.resources.provider_stack.push(provider)
             for i in range(num_nurses):
                 nurse = Nurse()
-                sim_name.resources.nurse_stack.push(nurse)
+                sim.resources.nurse_stack.push(nurse)
             for i in range(num_techs):
                 tech = LabTech()
-                sim_name.resources.tech_stack.push(tech)
+                sim.resources.tech_stack.push(tech)
             for i in range(num_beds):
                 bed = Bed()
-                sim_name.resources.bed_stack.push(bed)
-
-
+                sim.resources.bed_stack.push(bed)
             print()
+
             
         case "2":
-            sim_name.run()
-        case "3":
-            sys.exit()
+            while True:
+                print('==========Simulations==========')
+                for i, sim in enumerate(sims):
+                    print(str(i)+') '+sim.sim_id)
 
+                run_sim = sims[int(input('Enter the menu number for the simulation you would like to run: '))]
+                print()
+                
+                Patient.id_count = 0
+                Resource.staff_id_count = 0
+                Resource.bed_id_count = 0
+
+                run_sim.run()
+                break
+        case "3":
+            break
         case _:
             print("Invalid input, try again.")
 
-
-
-
-arrive_test = Arrive(sim)
-arrive_test.execute()
-arrive_test.execute()
-
-triage_test = Start_Triage(sim)
-triage_test.execute()
-
-print(str(sim.queues.triage_queue))
 
 
 

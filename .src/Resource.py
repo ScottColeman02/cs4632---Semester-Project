@@ -23,13 +23,7 @@ class Provider(Resource):
         super().__init__()
         self.name = "PROVIDER"
         Resource.staff_id_count += 1
-        self.emp_id = "P_"+str(Resource.staff_id_count)
-
-    def evaluation(self, patient):
-        eval_time = 0.0
-
-        
-        return eval_time    
+        self.emp_id = "P_"+str(Resource.staff_id_count)  
 
 class LabTech(Resource):
     def __init__(self):
