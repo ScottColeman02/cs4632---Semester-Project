@@ -132,7 +132,6 @@ class StatsCollector:
                         '% of patients needed labs': round((simulation.num_labs / simulation.patient_count)*100, 2),
 
                         'Completion rate': round((simulation.patients_fully_treated / simulation.patient_count)*100, 2),
-                        'Throughput': round((simulation.patients_fully_treated / simulation.final_time)*60, 2),
                         'Total events processed': len(simulation.events_log),
 
                         'Triage nurse utilization %': round((1 - avg_available('Triage Nurses Available') / simulation.num_tn)*100, 2),
@@ -143,7 +142,8 @@ class StatsCollector:
 
                         'Avg total time in ER': float(np.mean(self.total_times)),
                         'Median total time in ER': float(np.median(self.total_times)),
-                        'Final simulation time': simulation.final_time
+                        'Final simulation time': simulation.final_time,
+                        'Throughput': round((simulation.patients_fully_treated / simulation.final_time)*60, 2)
                     }
                 }
         sim_summ.update(self.comp_wait_stats(simulation))
