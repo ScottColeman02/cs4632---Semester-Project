@@ -20,7 +20,8 @@ while True:
     print("==========ER Simulation==========")
     print("1. Create a new simulation")
     print("2. Run a simulation")
-    print("3. Exit")
+    print('3. Delete a simulation')
+    print("4. Exit")
     choice = input("Please make a selection: ")
     print()
 
@@ -81,7 +82,15 @@ while True:
                 for i, sim in enumerate(sims):
                     print(str(i)+') '+sim.sim_id)
 
-                run_sim = sims[int(input('Enter the menu number for the simulation you would like to run: '))]
+                print(str(len(sims))+') Go back')
+
+                selec = int(input('Enter the menu number for the simulation you would like to run: '))
+
+                if(selec == len(sims)):
+                    print()
+                    break
+
+                run_sim = sims[selec]
                 print()
                 
                 Patient.id_count = 0
@@ -90,7 +99,26 @@ while True:
 
                 run_sim.run()
                 break
-        case "3":
+        case '3':
+            while True:
+                print('==========Simulations==========')
+                for i, sim in enumerate(sims):
+                    print(str(i)+') '+sim.sim_id)
+
+                print(str(len(sims))+') Go back')
+
+                selec = int(input('Enter the menu number for the simulation you would like to delete: '))
+
+                if(selec == len(sims)):
+                    print()
+                    break
+                
+                del_sim_name = sims[selec].sim_id
+                sims.remove(sims[selec])
+                print('\n'+del_sim_name+' has been deleted.')
+                print()
+                break
+        case "4":
             break
         case _:
             print("Invalid input, try again.")
