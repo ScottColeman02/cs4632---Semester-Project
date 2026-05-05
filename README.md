@@ -1,44 +1,112 @@
-# cs4632---Semester-Project
+# Emergency Room Discrete Event Simulation
+CS 4632 Semester Project
+Scott Coleman - Red Hot Data Analysts
 
-Project Description: I plan to implement a DES that represents an Emergency Room. From my simulation I hope to gain insight into how to improve emergency room efficiency. 
+# Project Description: 
+This project implements a discrete event simulation of an ER. The motivation behind this project is to model patient flow and resource utilization in order to analyze overall ER performance.
 
-Scott Coleman
-Team: Red Hot Data Analysts
-
-# Project Status:
-
-The core functionalities of the simuation have been added. Simulations can be run and produce event log output. Features to come include Poisson Distirbution for arrivals ,statistics collection and output file creation, and triage policies. Given that my proposal lacked detailed explanation of specifities of classes I have implented several changes. These are mainly architectural and are explained in the Architecture Overview section.
+The simulation includes core ER processes such as:
+* Patient arrival
+* Triage
+* Bed assignment
+* Provider evaluation
+* Treatment and discharge
 
 # Installation Instructions:
+The following is needed in order to run this project:
+* Python 3.10+
+* An IDE (VS Code is recommended)
 
-To run the simulation users need at least Python 3.10 installed.The only way I have tested running the simulation is through VS Code. At this current stage in the development process I recommend that users do the same. Open the folder containing the program files in VS code.
+Steps:
+1. Clone or download this repository
+2. Open the project folder in preferred IDE
+3. Verify Python configuration
 
 # Usage: 
+1. Open Main.py
+2. Run the file
 
-To run the simulation program navigate to the Main.py file and run it. The main menu presents the options available. To select one enter the corresponding number and press enter. Before running the simulation it is important that you first choose option 1 and enter the simulation parameters. Once parameters have been assigned the simulation is ready to run. Upon entering option 2 you will be prompted to enter a file path for you event log file. At the end of the file path make sure to enter a valid file name followed by '.txt'. 
+A console menu will be displayed:
+* Option 1: Create a simulation job
+* Option 2: Run a simulation job
+* Option 3: Delete a simulation job
+* Option 4: Exit the program
+
+Some important things to note:
+* Output files with simulation results will be available in the project folder
+* Option 1 must be selected and completed in order for option 2 and 3 to have any useful functionality
+
+
+# Simulation Parameters
+* Simulation name: Meaningful name to orgranize simulation outputs
+* Number of Resources:
+  - Nurses, Providers, Beds, Lab Technicians
+  - Controls the available staff and resource pool
+* Simulation time: The total amount of time to run the simulation for in minutes
+* Arrival Rate: Used to set the patient average number of patients arriving to the ER per hour
+* Random seed: Used to keep random number generators consistent across each component of the simulation
+* Stats interval: Time steps to record state metrics of the simulation
 
 # Architecture Overview:
+* Core Engine
+  - Simulation.py
+    + Controls simulation clock
+    + Executes events
+    + Manages event loop
+  - Main.py
+    + Handles parameter input
+    + Creates and starts simulation jobs
 
-Main.py is something I decided to add to handle the implementation of the simulation. Users are prompted to enter parameters and run the simulation through a simple console menu. 
+* Supporting Components
+  - EventList.py: Manages scheduling and retrieval of events
+  - Event.py: Defines event types
+    + Uses inheritance for flexibility
+  - Patient.py: Represents patient entities
 
-The Simulation.py file is the main engine of the simulation. It contains the main while loop and handles the retrieval and execution of events. Differing from the UML diagram, the Simulation class does not contain a dictionary for the patients as of now and next_patient_id was handed over to the Patient class. 
+* Resource and Queue Management
+  - ResourceManager.py
+    + Handles resource allocation (seize/release)
+    + Resource tracking using stacks
+  - QueueManager.py
+    + Manages queues for each station
+  - DataStructures.py
+    + Contains custom implementations of FIFO and Priority Queue as well as Stack
 
-The QueueManager.py file contains creation of the queues for each station. The main change here was the implementation of a discharge queue. 
+* Additional Components
+  - Resource.py
+    + Defines resource types
+    + Uses inheritance for flexibility
+  - TriagePolicy.py
+    + Defines logic assigning patient ESI level
+  - StatsCollector.py
+    + Handles collection of metrics
+    + Computes key statistics
+    + Create output files
+# Example Outputs
+![Output Files](images/main_menu.png) 
+Main menu displayed to the user on the console.
 
-ResourceManager.py handles the seizing and release of resources. Counts are also maintained for each resources type as well as custom stacks that store the actual resource objects. I decided to add a triage nurse object in order to help distinguish between the different job types that nurses perform. 
+![Output Files](images/option_1.png)
+After selecting option 1 the user is prompted to enter values for each of the parameteres.
 
-EventList.py handles the creation of the event list and defines its methods. No changes were made.
+![Output Files](images/option_2_menu.png)
+Selecting option 2 displays all simulation jobs that have been created. Entering the menu number for a simulation executes the simulation.
 
-TriagePolicy.py is still in the works.
+![Output Files](images/option_3_menu.png)
+Selecting option 3 displays all simulation jobs. Entering the menu number for a simulation deletes that simulation job. This can not be undone.
 
-StatsCollector.py is still in the works. Currently I have added a new feature not present in the UML digram which is the event log. 
+![Output Files](images/option_3_result.png)
+Output after selecting 'test' to be deleted.
 
-These files are direct implementations of the composition showed on the UML diagram that they have with the Simulation.py file. 
+![Output Files](images/option3_confirm.png)
+Confirmation showing that 'test' has been deleted.
 
-Patient.py contains the attributes and methods for patient objects. I altered the design of this class quite a bit mainly to imporve clarity. I introduced attributes chief complaint, severity and bed_num as ways to help with triage and esi assignment as well as tracking bed availability.
+![Output Files](images/option4.png)
+Upon selecting option 4 the program is terminated.
 
-DataStructures.py contains the classes Queue, PriorityQueue, FIFOQueue, and Stack. The queue related classes contain the methods for their respective queue types. I chose to implement Stack as way to store the resource objects that are created during the simulation.
+![Output Files](images/output_files_ex.png) 
+Example of output files within the project folder.
 
-Resource.py contains the different resource classes besed on their type, all inheriting from Resource. This differs from the UML diagram and again was done to clearly distinguish between the different resource objects.
 
-Event.py contains the Event class and the child classes that correspond to the events that occur during the simulation. I chose to go for this structure to allow me to add custom attributes and needs for each of the events. 
+# Project Status
+The simulation is finally complete and ready for use!
