@@ -83,29 +83,29 @@ Some important things to note:
     + Computes key statistics
     + Create output files
 # Example Outputs
-![Output Files](images/main_menu.png) 
-Main menu displayed to the user on the console.
+![Output Files](images/main_menu.png)
+- Main menu displayed to the user on the console.
 
 ![Output Files](images/option_1.png)
-After selecting option 1 the user is prompted to enter values for each of the parameteres.
+- After selecting option 1 the user is prompted to enter values for each of the parameteres.
 
 ![Output Files](images/option_2_menu.png)
-Selecting option 2 displays all simulation jobs that have been created. Entering the menu number for a simulation executes the simulation.
+- Selecting option 2 displays all simulation jobs that have been created. Entering the menu number for a simulation executes the simulation.
 
 ![Output Files](images/option_3_menu.png)
-Selecting option 3 displays all simulation jobs. Entering the menu number for a simulation deletes that simulation job. This can not be undone.
+- Selecting option 3 displays all simulation jobs. Entering the menu number for a simulation deletes that simulation job. This can not be undone.
 
 ![Output Files](images/option_3_result.png)
-Output after selecting 'test' to be deleted.
+- Output after selecting 'test' to be deleted.
 
 ![Output Files](images/option3_confirm.png)
-Confirmation showing that 'test' has been deleted.
+- Confirmation showing that 'test' has been deleted.
 
 ![Output Files](images/option4.png)
-Upon selecting option 4 the program is terminated.
+- Upon selecting option 4 the program is terminated.
 
 ![Output Files](images/output_files_ex.png) 
-Example of output files within the project folder.
+- Example of output files within the project folder.
 
 
 # Project Status
