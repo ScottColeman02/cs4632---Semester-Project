@@ -82,6 +82,7 @@ Some important things to note:
     + Handles collection of metrics
     + Computes key statistics
     + Create output files
+
 # Example Outputs
 ![Output Files](images/main_menu.png)
 - Main menu displayed to the user on the console.
